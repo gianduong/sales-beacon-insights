@@ -2,6 +2,7 @@
 import React from 'react';
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { SalesMetrics } from '@/services/mockData';
+import { formatCurrency, formatPercent, formatNumber } from '@/utils/formatters';
 
 type ChartType = 'line' | 'area' | 'bar';
 
@@ -32,8 +33,8 @@ const SalesChart: React.FC<SalesChartProps> = ({
       date: new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
     }));
   
-  // Format y-axis values based on metric type
-  const formatYAxis = (value: number) => {
+  // Format y-axis values based on metric type - ensure it always returns a string
+  const formatYAxis = (value: number): string => {
     if (typeof value === 'number') {
       if (
         metric === 'revenue' || 
@@ -54,7 +55,7 @@ const SalesChart: React.FC<SalesChartProps> = ({
         return `${(value * 100).toFixed(0)}%`;
       }
     }
-    return value;
+    return value.toString(); // Ensure we always return a string
   };
   
   // Format tooltip values
