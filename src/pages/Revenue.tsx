@@ -3,15 +3,15 @@ import React from 'react';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
-import { getSalesMetrics } from '@/services/mockData';
+import { generateSalesData, SalesMetrics } from '@/services/mockData';
 import { formatCurrency, formatPercent, formatNumber } from '@/utils/formatters';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { CircleDollarSign, TrendingUp, ShoppingCart, Users, Repeat, BarChart3 } from 'lucide-react';
+import { CircleDollarSign, TrendingUp, ShoppingCart, Users, BarChart3 } from 'lucide-react';
 
 const Revenue = () => {
-  const { data: salesData, isLoading } = useQuery({
+  const { data: salesData, isLoading } = useQuery<SalesMetrics[]>({
     queryKey: ['salesMetrics'],
-    queryFn: getSalesMetrics
+    queryFn: () => generateSalesData(30)
   });
 
   const revenueMetricsCards = [
@@ -32,7 +32,7 @@ const Revenue = () => {
       value: isLoading ? '...' : formatCurrency(
         salesData ? 
         salesData.reduce((sum, item) => sum + item.revenue, 0) / 
-        salesData.reduce((sum, item) => sum + item.orders, 0) : 0
+        salesData.reduce((sum, item) => sum + item.totalOrders, 0) : 0
       ),
       icon: <ShoppingCart className="h-5 w-5 text-indigo-500" />,
       description: 'Revenue per order'
@@ -41,7 +41,7 @@ const Revenue = () => {
       title: 'Customer Lifetime Value',
       value: isLoading ? '...' : formatCurrency(salesData ? 
         (salesData.reduce((sum, item) => sum + item.revenue, 0) / 
-         salesData.reduce((sum, item) => sum + item.customers, 0)) * 3 : 0),
+         salesData.reduce((sum, item) => sum + item.totalCustomers, 0)) * 3 : 0),
       icon: <Users className="h-5 w-5 text-purple-500" />,
       description: 'Estimated value per customer'
     }
