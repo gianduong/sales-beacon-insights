@@ -63,7 +63,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle }) => {
             <div className="bg-polaris-indigo-600 h-8 w-8 rounded-md flex items-center justify-center">
               <BarChart3 className="text-white h-5 w-5" />
             </div>
-            <span className="text-lg font-semibold text-gray-900">Sales Beacon</span>
+            <span className="text-lg font-semibold text-gray-900">Trakpilot</span>
           </div>
         </div>
         
@@ -102,7 +102,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle }) => {
               <div className="bg-polaris-indigo-600 h-8 w-8 rounded-md flex items-center justify-center">
                 <BarChart3 className="text-white h-5 w-5" />
               </div>
-              <span className="text-lg font-semibold text-gray-900">Sales Beacon</span>
+              <span className="text-lg font-semibold text-gray-900">Trakpilot</span>
             </div>
             <button 
               onClick={() => setSidebarOpen(false)}
