@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,19 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				polaris: {
+					'indigo-50': '#f5f7ff',
+					'indigo-100': '#ebefff',
+					'indigo-200': '#d2d9ff',
+					'indigo-300': '#a4afff',
+					'indigo-400': '#6d7cff',
+					'indigo-500': '#5c6ac4',
+					'indigo-600': '#3a4bad',
+					'indigo-700': '#2e399d',
+					'indigo-800': '#1f2574',
+					'indigo-900': '#000639',
+				},
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
