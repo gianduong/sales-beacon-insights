@@ -1,7 +1,7 @@
 
 import React, { ReactNode, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BarChart3, Package, CircleDollarSign, Settings, Home, Menu, X } from 'lucide-react';
+import { BarChart3, Package, CircleDollarSign, Settings, Home, Menu, X, ShoppingCart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -21,6 +21,11 @@ const navItems: NavItem[] = [
     name: 'Products',
     path: '/products',
     icon: <Package className="h-5 w-5" />
+  },
+  {
+    name: 'Product Analytics',
+    path: '/product-analytics',
+    icon: <ShoppingCart className="h-5 w-5" />
   },
   {
     name: 'Sales Analytics',
