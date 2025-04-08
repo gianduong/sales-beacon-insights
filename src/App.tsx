@@ -11,6 +11,7 @@ import Sales from "./pages/Sales";
 import Revenue from "./pages/Revenue";
 import Settings from "./pages/Settings";
 import ProductAnalytics from "./pages/ProductAnalytics";
+import AdsRanking from "./pages/AdsRanking";
 import NotFound from "./pages/NotFound";
 
 // Create a client
@@ -31,6 +32,7 @@ const App = () => {
               <Route path="/revenue" element={<Revenue />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/product-analytics" element={<ProductAnalytics />} />
+              <Route path="/ads-ranking" element={<AdsRanking />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
