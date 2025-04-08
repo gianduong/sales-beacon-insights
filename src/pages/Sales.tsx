@@ -139,7 +139,7 @@ const Sales = () => {
           data={salesData}
           metric="grossProfit"
           secondaryMetric="netProfit"
-          title="Profit Analysis"
+          title="Profit Analysis (Gross vs Net)"
           type="line"
         />
         
@@ -147,8 +147,111 @@ const Sales = () => {
           data={salesData}
           metric="customerRetentionRate"
           secondaryMetric="churnRate"
-          title="Customer Retention vs Churn"
+          title="Customer Retention vs Churn Rate"
           type="line"
+        />
+      </div>
+      
+      {/* New Charts - First Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <SalesChart
+          data={salesData}
+          metric="costPerAcquisition"
+          title="Cost per Acquisition (CPA) Trend"
+          type="line"
+          color="#f97316" // Orange
+        />
+        
+        <SalesChart
+          data={salesData}
+          metric="customerLifetimeValue"
+          title="Customer Lifetime Value (CLV) Trend"
+          type="line"
+          color="#10b981" // Green
+        />
+      </div>
+      
+      {/* New Charts - Second Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <SalesChart
+          data={salesData}
+          metric="clickThroughRate"
+          secondaryMetric="bounceRate"
+          title="CTR vs Bounce Rate"
+          type="line"
+          color="#8b5cf6" // Purple
+          secondaryColor="#ef4444" // Red
+        />
+        
+        <SalesChart
+          data={salesData}
+          metric="returnOnInvestment"
+          secondaryMetric="returnOnAdSpend"
+          title="ROI vs ROAS"
+          type="bar"
+          color="#3b82f6" // Blue
+          secondaryColor="#f59e0b" // Amber
+        />
+      </div>
+      
+      {/* New Charts - Third Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <SalesChart
+          data={salesData}
+          metric="refundRate"
+          title="Refund Rate Trend"
+          type="area"
+          color="#ef4444" // Red
+        />
+        
+        <SalesChart
+          data={salesData}
+          metric="repeatCustomerRate"
+          title="Repeat Customer Rate"
+          type="area"
+          color="#22c55e" // Green
+        />
+      </div>
+      
+      {/* New Charts - Fourth Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <SalesChart
+          data={salesData}
+          metric="totalCustomers"
+          secondaryMetric="repeatCustomers"
+          title="Total vs Repeat Customers"
+          type="bar"
+          color="#0ea5e9" // Sky
+          secondaryColor="#14b8a6" // Teal
+        />
+        
+        <SalesChart
+          data={salesData}
+          metric="profitMargin"
+          title="Profit Margin Trend"
+          type="line"
+          color="#6366f1" // Indigo
+        />
+      </div>
+      
+      {/* New Charts - Fifth Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <SalesChart
+          data={salesData}
+          metric="revenue"
+          secondaryMetric="netRevenue"
+          title="Gross vs Net Revenue"
+          type="area"
+          color="#84cc16" // Lime
+          secondaryColor="#a3e635" // Light green
+        />
+        
+        <SalesChart
+          data={salesData}
+          metric="averageOrderValue"
+          title="Average Order Value Trend"
+          type="bar"
+          color="#ec4899" // Pink
         />
       </div>
       
