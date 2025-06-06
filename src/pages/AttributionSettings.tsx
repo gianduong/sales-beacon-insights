@@ -74,7 +74,7 @@ const AttributionSettings = () => {
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Hero Section */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 p-8 text-white">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.1"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%239C92AC\" fill-opacity=\"0.1\"%3E%3Ccircle cx=\"30\" cy=\"30\" r=\"2\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
           <div className="relative">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-3 bg-purple-500/20 rounded-xl">
@@ -119,7 +119,7 @@ const AttributionSettings = () => {
                     <div className={`
                       relative overflow-hidden rounded-2xl border-2 transition-all duration-300 cursor-pointer
                       ${isSelected 
-                        ? 'border-transparent bg-gradient-to-r ' + option.gradient + ' p-[2px]' 
+                        ? `border-transparent bg-gradient-to-r ${option.gradient} p-[2px]`
                         : 'border-gray-200 hover:border-gray-300'
                       }
                     `}>
@@ -141,7 +141,7 @@ const AttributionSettings = () => {
                                   <div className={`
                                     p-2 rounded-lg transition-all duration-300
                                     ${isSelected 
-                                      ? 'bg-gradient-to-r ' + option.gradient + ' text-white' 
+                                      ? `bg-gradient-to-r ${option.gradient} text-white`
                                       : 'bg-gray-100 text-gray-600'
                                     }
                                   `}>
