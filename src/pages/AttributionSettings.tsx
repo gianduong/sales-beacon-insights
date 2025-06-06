@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -84,7 +85,7 @@ const AttributionSettings = () => {
 
   return (
     <Layout title="Attribution Intelligence" subtitle="Configure your advanced click tracking attribution model">
-      <div className="max-w-6xl mx-auto space-y-8">
+      <div className="max-w-7xl mx-auto space-y-8">
         {/* Hero Section */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 p-8 text-white">
           <div className="absolute inset-0 opacity-20" style={{
@@ -123,7 +124,7 @@ const AttributionSettings = () => {
             <RadioGroup 
               value={selectedAttribution} 
               onValueChange={(value) => setSelectedAttribution(value as AttributionModel)}
-              className="space-y-6"
+              className="grid grid-cols-1 lg:grid-cols-3 gap-6"
             >
               {attributionOptions.map((option) => {
                 const IconComponent = option.icon;
@@ -134,87 +135,87 @@ const AttributionSettings = () => {
                   <div key={option.id} className="relative">
                     <Collapsible open={isOpen} onOpenChange={() => toggleSection(option.id)}>
                       <div className={`
-                        relative overflow-hidden rounded-2xl border-2 transition-all duration-300
+                        relative overflow-hidden rounded-2xl border-2 transition-all duration-300 h-full
                         ${isSelected 
                           ? `border-transparent bg-gradient-to-r ${option.gradient} p-[2px]`
                           : 'border-gray-200 hover:border-gray-300'
                         }
                       `}>
                         <div className={`
-                          rounded-2xl transition-all duration-300
+                          rounded-2xl transition-all duration-300 h-full flex flex-col
                           ${isSelected ? 'bg-white' : 'bg-white hover:bg-gray-50'}
                         `}>
-                          <CollapsibleTrigger className="w-full p-6 text-left">
-                            <div className="flex items-start space-x-4">
-                              <RadioGroupItem 
-                                value={option.id} 
-                                id={option.id} 
-                                className="mt-2 data-[state=checked]:border-current"
-                                style={isSelected ? { color: option.gradient.includes('blue') ? '#3b82f6' : option.gradient.includes('emerald') ? '#059669' : '#ea580c' } : {}}
-                              />
+                          <CollapsibleTrigger className="w-full p-4 text-left flex-1">
+                            <div className="flex flex-col space-y-4 h-full">
+                              <div className="flex items-start justify-between">
+                                <RadioGroupItem 
+                                  value={option.id} 
+                                  id={option.id} 
+                                  className="data-[state=checked]:border-current"
+                                  style={isSelected ? { color: option.gradient.includes('blue') ? '#3b82f6' : option.gradient.includes('emerald') ? '#059669' : '#ea580c' } : {}}
+                                />
+                                <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                              </div>
                               <div className="flex-1">
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-3">
-                                    <div className={`
-                                      p-2 rounded-lg transition-all duration-300
-                                      ${isSelected 
-                                        ? `bg-gradient-to-r ${option.gradient} text-white`
-                                        : 'bg-gray-100 text-gray-600'
-                                      }
-                                    `}>
-                                      <IconComponent className="h-5 w-5" />
-                                    </div>
-                                    <div>
-                                      <Label htmlFor={option.id} className="text-xl font-semibold cursor-pointer flex items-center gap-2">
-                                        {option.title}
-                                        {option.isDefault && (
-                                          <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
-                                            Recommended
-                                          </span>
-                                        )}
-                                      </Label>
-                                      <p className="text-sm font-medium text-gray-600">
-                                        {option.subtitle}
-                                      </p>
-                                    </div>
+                                <div className="flex items-center gap-3 mb-3">
+                                  <div className={`
+                                    p-2 rounded-lg transition-all duration-300
+                                    ${isSelected 
+                                      ? `bg-gradient-to-r ${option.gradient} text-white`
+                                      : 'bg-gray-100 text-gray-600'
+                                    }
+                                  `}>
+                                    <IconComponent className="h-4 w-4" />
                                   </div>
-                                  <ChevronDown className={`h-5 w-5 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                                  <div>
+                                    <Label htmlFor={option.id} className="text-lg font-semibold cursor-pointer flex items-center gap-2">
+                                      {option.title}
+                                      {option.isDefault && (
+                                        <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
+                                          Recommended
+                                        </span>
+                                      )}
+                                    </Label>
+                                    <p className="text-xs font-medium text-gray-600">
+                                      {option.subtitle}
+                                    </p>
+                                  </div>
                                 </div>
-                                <p className="text-gray-700 leading-relaxed mt-2">
+                                <p className="text-gray-700 leading-relaxed text-sm">
                                   {option.description}
                                 </p>
                               </div>
                             </div>
                           </CollapsibleTrigger>
 
-                          <CollapsibleContent className="px-6 pb-6">
-                            <div className="ml-10 space-y-4">
+                          <CollapsibleContent className="px-4 pb-4">
+                            <div className="space-y-4">
                               {/* Benefits Grid */}
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              <div className="grid grid-cols-1 gap-2">
                                 {option.benefits.map((benefit, index) => (
                                   <div key={index} className="flex items-center gap-2">
                                     <CheckCircle className={`
-                                      h-4 w-4 flex-shrink-0
+                                      h-3 w-3 flex-shrink-0
                                       ${isSelected ? 'text-green-600' : 'text-gray-400'}
                                     `} />
-                                    <span className="text-sm text-gray-600">{benefit}</span>
+                                    <span className="text-xs text-gray-600">{benefit}</span>
                                   </div>
                                 ))}
                               </div>
 
                               {/* Use Case */}
                               <div className={`
-                                p-4 rounded-xl border transition-all duration-300
+                                p-3 rounded-xl border transition-all duration-300
                                 ${isSelected 
                                   ? 'bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200' 
                                   : 'bg-gray-50 border-gray-200'
                                 }
                               `}>
-                                <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                                  <ArrowRight className="h-4 w-4" />
+                                <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2 text-sm">
+                                  <ArrowRight className="h-3 w-3" />
                                   Best Use Case
                                 </h4>
-                                <p className="text-sm text-gray-700">
+                                <p className="text-xs text-gray-700">
                                   {option.useCase}
                                 </p>
                               </div>
@@ -396,3 +397,4 @@ const AttributionSettings = () => {
 };
 
 export default AttributionSettings;
+
