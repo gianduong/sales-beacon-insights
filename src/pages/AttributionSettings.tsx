@@ -1,5 +1,4 @@
 
-
 import React, { useState } from 'react';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { toast } from 'sonner';
-import { Save, Info, Target, TrendingUp, Zap, CheckCircle, ArrowRight, Sparkles, ChevronDown } from 'lucide-react';
+import { Save, Info, Target, TrendingUp, Zap, CheckCircle, ArrowRight, Sparkles, ChevronDown, DollarSign, Users, AlertTriangle, TrendingDown } from 'lucide-react';
 
 type AttributionModel = 'last-click' | 'first-click' | 'custom';
 
@@ -76,12 +75,43 @@ const AttributionSettings = () => {
     }
   ];
 
+  const comparisonData = {
+    'last-click': {
+      revenue: { value: 85, trend: 'up', label: 'Nhiều conversion credit' },
+      audience: { value: 65, trend: 'down', label: 'Ít lookalike audiences' },
+      scenarios: [
+        'User click Google Ads → click Facebook → mua hàng = KHÔNG tính conversion',
+        'User click Facebook → click Google Ads → mua hàng = Tính conversion',
+        'Chỉ credit cho touchpoint cuối cùng từ Google Ads'
+      ]
+    },
+    'first-click': {
+      revenue: { value: 45, trend: 'down', label: 'Ít conversion credit' },
+      audience: { value: 90, trend: 'up', label: 'Nhiều top-funnel data' },
+      scenarios: [
+        'User click Google Ads → click Facebook → mua hàng = Tính conversion',
+        'Credit cho lần click đầu tiên từ Google Ads',
+        'Tốt cho brand awareness và customer journey dài'
+      ]
+    },
+    'custom': {
+      revenue: { value: 75, trend: 'up', label: 'Balanced attribution' },
+      audience: { value: 85, trend: 'up', label: 'Smart audience building' },
+      scenarios: [
+        'Phân chia credit theo rules tùy chỉnh',
+        'Có thể loại trừ Facebook/TikTok traffic',
+        'Sử dụng Enhanced Conversions và Server-to-Server'
+      ]
+    }
+  };
+
   const handleSave = () => {
     console.log('Selected attribution model:', selectedAttribution);
     toast.success('Attribution settings saved successfully!');
   };
 
   const selectedOption = attributionOptions.find(opt => opt.id === selectedAttribution);
+  const selectedComparison = comparisonData[selectedAttribution];
 
   return (
     <Layout title="Attribution Intelligence" subtitle="Configure your advanced click tracking attribution model">
@@ -106,6 +136,123 @@ const AttributionSettings = () => {
             </p>
           </div>
         </div>
+
+        {/* Attribution Comparison */}
+        <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-gray-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-3 text-2xl">
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <TrendingUp className="h-6 w-6 text-orange-600" />
+              </div>
+              Revenue & Audience Impact Comparison
+            </CardTitle>
+            <CardDescription className="text-lg">
+              See how different attribution models affect your revenue tracking and audience building
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+              {attributionOptions.map((option) => {
+                const comparison = comparisonData[option.id];
+                const isSelected = selectedAttribution === option.id;
+                
+                return (
+                  <div 
+                    key={option.id} 
+                    className={`
+                      p-6 rounded-2xl border-2 transition-all duration-300 cursor-pointer
+                      ${isSelected 
+                        ? `border-transparent bg-gradient-to-r ${option.gradient} p-[2px]`
+                        : 'border-gray-200 hover:border-gray-300'
+                      }
+                    `}
+                    onClick={() => setSelectedAttribution(option.id)}
+                  >
+                    <div className={`
+                      rounded-2xl p-6 h-full transition-all duration-300
+                      ${isSelected ? 'bg-white' : 'bg-white hover:bg-gray-50'}
+                    `}>
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className={`
+                          p-2 rounded-lg transition-all duration-300
+                          ${isSelected 
+                            ? `bg-gradient-to-r ${option.gradient} text-white`
+                            : 'bg-gray-100 text-gray-600'
+                          }
+                        `}>
+                          <option.icon className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-lg">{option.title}</h3>
+                          <p className="text-sm text-gray-600">{option.subtitle}</p>
+                        </div>
+                      </div>
+
+                      {/* Revenue Impact */}
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between p-3 bg-green-50 rounded-xl">
+                          <div className="flex items-center gap-2">
+                            <DollarSign className="h-4 w-4 text-green-600" />
+                            <span className="text-sm font-medium text-green-900">Revenue Tracking</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg font-bold text-green-900">{comparison.revenue.value}%</span>
+                            {comparison.revenue.trend === 'up' ? (
+                              <TrendingUp className="h-4 w-4 text-green-600" />
+                            ) : (
+                              <TrendingDown className="h-4 w-4 text-red-500" />
+                            )}
+                          </div>
+                        </div>
+                        <p className="text-xs text-gray-600">{comparison.revenue.label}</p>
+
+                        {/* Audience Impact */}
+                        <div className="flex items-center justify-between p-3 bg-blue-50 rounded-xl">
+                          <div className="flex items-center gap-2">
+                            <Users className="h-4 w-4 text-blue-600" />
+                            <span className="text-sm font-medium text-blue-900">Audience Building</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg font-bold text-blue-900">{comparison.audience.value}%</span>
+                            {comparison.audience.trend === 'up' ? (
+                              <TrendingUp className="h-4 w-4 text-green-600" />
+                            ) : (
+                              <TrendingDown className="h-4 w-4 text-red-500" />
+                            )}
+                          </div>
+                        </div>
+                        <p className="text-xs text-gray-600">{comparison.audience.label}</p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Detailed Scenario Explanation */}
+            <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-6">
+              <div className="flex items-start gap-3 mb-4">
+                <AlertTriangle className="h-6 w-6 text-amber-600 mt-1" />
+                <div>
+                  <h4 className="font-semibold text-amber-900 text-lg">
+                    {selectedOption?.title} - Chi tiết hoạt động
+                  </h4>
+                  <p className="text-amber-700 text-sm">
+                    Cách model này xử lý customer journey phức tạp
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-3">
+                {selectedComparison.scenarios.map((scenario, index) => (
+                  <div key={index} className="flex items-start gap-2">
+                    <div className="w-2 h-2 bg-amber-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <p className="text-amber-800 text-sm">{scenario}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Attribution Selection */}
         <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-gray-50">
@@ -397,4 +544,3 @@ const AttributionSettings = () => {
 };
 
 export default AttributionSettings;
-
