@@ -74,7 +74,9 @@ const AttributionSettings = () => {
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Hero Section */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 p-8 text-white">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%239C92AC\" fill-opacity=\"0.1\"%3E%3Ccircle cx=\"30\" cy=\"30\" r=\"2\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
+          <div className="absolute inset-0 opacity-20" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+          }}></div>
           <div className="relative">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-3 bg-purple-500/20 rounded-xl">
@@ -114,37 +116,37 @@ const AttributionSettings = () => {
                 const IconComponent = option.icon;
                 const isSelected = selectedAttribution === option.id;
                 
+                const borderClass = isSelected 
+                  ? `border-transparent bg-gradient-to-r ${option.gradient} p-[2px]`
+                  : 'border-gray-200 hover:border-gray-300';
+                
+                const iconBgClass = isSelected 
+                  ? `bg-gradient-to-r ${option.gradient} text-white`
+                  : 'bg-gray-100 text-gray-600';
+
+                const useCaseClass = isSelected 
+                  ? 'bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200' 
+                  : 'bg-gray-50 border-gray-200';
+                
                 return (
                   <div key={option.id} className="relative">
-                    <div className={`
-                      relative overflow-hidden rounded-2xl border-2 transition-all duration-300 cursor-pointer
-                      ${isSelected 
-                        ? `border-transparent bg-gradient-to-r ${option.gradient} p-[2px]`
-                        : 'border-gray-200 hover:border-gray-300'
-                      }
-                    `}>
-                      <div className={`
-                        rounded-2xl p-6 transition-all duration-300
-                        ${isSelected ? 'bg-white' : 'bg-white hover:bg-gray-50'}
-                      `}>
+                    <div className={`relative overflow-hidden rounded-2xl border-2 transition-all duration-300 cursor-pointer ${borderClass}`}>
+                      <div className={`rounded-2xl p-6 transition-all duration-300 ${isSelected ? 'bg-white' : 'bg-white hover:bg-gray-50'}`}>
                         <div className="flex items-start space-x-4">
                           <RadioGroupItem 
                             value={option.id} 
                             id={option.id} 
                             className="mt-2 data-[state=checked]:border-current"
-                            style={isSelected ? { color: option.gradient.includes('blue') ? '#3b82f6' : option.gradient.includes('emerald') ? '#059669' : '#ea580c' } : {}}
+                            style={isSelected ? { 
+                              color: option.gradient.includes('blue') ? '#3b82f6' : 
+                                     option.gradient.includes('emerald') ? '#059669' : '#ea580c' 
+                            } : {}}
                           />
                           <div className="flex-1 space-y-4">
                             <div className="flex items-start justify-between">
                               <div className="space-y-2">
                                 <div className="flex items-center gap-3">
-                                  <div className={`
-                                    p-2 rounded-lg transition-all duration-300
-                                    ${isSelected 
-                                      ? `bg-gradient-to-r ${option.gradient} text-white`
-                                      : 'bg-gray-100 text-gray-600'
-                                    }
-                                  `}>
+                                  <div className={`p-2 rounded-lg transition-all duration-300 ${iconBgClass}`}>
                                     <IconComponent className="h-5 w-5" />
                                   </div>
                                   <div>
@@ -171,23 +173,14 @@ const AttributionSettings = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                               {option.benefits.map((benefit, index) => (
                                 <div key={index} className="flex items-center gap-2">
-                                  <CheckCircle className={`
-                                    h-4 w-4 flex-shrink-0
-                                    ${isSelected ? 'text-green-600' : 'text-gray-400'}
-                                  `} />
+                                  <CheckCircle className={`h-4 w-4 flex-shrink-0 ${isSelected ? 'text-green-600' : 'text-gray-400'}`} />
                                   <span className="text-sm text-gray-600">{benefit}</span>
                                 </div>
                               ))}
                             </div>
 
                             {/* Use Case */}
-                            <div className={`
-                              p-4 rounded-xl border transition-all duration-300
-                              ${isSelected 
-                                ? 'bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200' 
-                                : 'bg-gray-50 border-gray-200'
-                              }
-                            `}>
+                            <div className={`p-4 rounded-xl border transition-all duration-300 ${useCaseClass}`}>
                               <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
                                 <ArrowRight className="h-4 w-4" />
                                 Best Use Case
