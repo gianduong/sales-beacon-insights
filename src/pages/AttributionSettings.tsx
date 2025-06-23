@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -375,7 +374,7 @@ const AttributionSettings = () => {
           </div>
         )}
 
-        {/* Understanding Attribution Models */}
+        {/* Combined Understanding Attribution Models */}
         <Card className="animate-fade-in">
           <CardHeader>
             <CardTitle className="flex items-center gap-3">
@@ -383,8 +382,8 @@ const AttributionSettings = () => {
               Understanding Attribution Models
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-gray-600 mb-6 leading-relaxed">
+          <CardContent className="space-y-6">
+            <p className="text-gray-600 leading-relaxed">
               Attribution models determine how credit for conversions is assigned to touchpoints in the customer journey. 
               Choosing the right model impacts how you measure campaign performance and allocate your marketing budget.
             </p>
@@ -420,13 +419,12 @@ const AttributionSettings = () => {
                 </p>
               </div>
             </div>
+
+            <p className="text-center text-gray-500 text-sm">
+              You can change your attribution model settings at any time.
+            </p>
           </CardContent>
         </Card>
-
-        {/* Bottom Note */}
-        <p className="text-center text-gray-500 text-sm animate-fade-in">
-          You can change your attribution model settings at any time.
-        </p>
 
         {/* Confirmation Dialog */}
         <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
