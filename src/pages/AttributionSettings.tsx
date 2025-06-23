@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,10 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
-import { Info } from 'lucide-react';
+import { Info, ChevronDown, ChevronUp } from 'lucide-react';
 
 type AttributionModel = 'last-click' | 'first-click' | 'custom';
 
@@ -17,7 +15,7 @@ const AttributionSettings = () => {
   const [selectedAttribution, setSelectedAttribution] = useState<AttributionModel>('last-click');
   const [tempSelection, setTempSelection] = useState<AttributionModel>('last-click');
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
+  const [showDetails, setShowDetails] = useState(false);
 
   const attributionOptions = [
     {
@@ -118,16 +116,6 @@ const AttributionSettings = () => {
     setTempSelection(selectedAttribution);
   };
 
-  const toggleCard = (cardId: string) => {
-    const newExpanded = new Set(expandedCards);
-    if (newExpanded.has(cardId)) {
-      newExpanded.delete(cardId);
-    } else {
-      newExpanded.add(cardId);
-    }
-    setExpandedCards(newExpanded);
-  };
-
   const renderRevenueChart = (chart: any) => {
     const channels = [
       { name: 'Google Ads', value: chart.googleAds, color: 'bg-blue-500' },
@@ -175,7 +163,6 @@ const AttributionSettings = () => {
         >
           {attributionOptions.map((option) => {
             const isSelected = selectedAttribution === option.id;
-            const isExpanded = expandedCards.has(option.id);
             
             return (
               <Card 
@@ -192,177 +179,200 @@ const AttributionSettings = () => {
                   boxShadow: isSelected ? `0 10px 25px -5px ${option.borderColor}30` : undefined
                 }}
               >
-                <Collapsible open={isExpanded} onOpenChange={() => toggleCard(option.id)}>
-                  <CardHeader className="pb-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-3 flex-1">
-                        <div className="flex items-center gap-2 mt-1">
-                          <RadioGroupItem 
-                            value={option.id} 
-                            id={option.id}
-                            className="data-[state=checked]:border-2"
-                            style={{ 
-                              borderColor: isSelected ? option.borderColor : undefined,
-                              color: isSelected ? option.borderColor : undefined
-                            }}
-                          />
-                          <div className={`w-2 h-2 rounded-full ${option.iconBg} transition-all duration-300`} />
+                <CardHeader className="pb-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start gap-3 flex-1">
+                      <div className="flex items-center gap-2 mt-1">
+                        <RadioGroupItem 
+                          value={option.id} 
+                          id={option.id}
+                          className="data-[state=checked]:border-2"
+                          style={{ 
+                            borderColor: isSelected ? option.borderColor : undefined,
+                            color: isSelected ? option.borderColor : undefined
+                          }}
+                        />
+                        <div className={`w-2 h-2 rounded-full ${option.iconBg} transition-all duration-300`} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-2">
+                          <Label htmlFor={option.id} className="font-semibold text-gray-900 cursor-pointer text-sm">
+                            {option.title}
+                          </Label>
+                          {isSelected && (
+                            <Badge 
+                              className="text-xs font-medium transition-all duration-300"
+                              style={{ 
+                                backgroundColor: `${option.borderColor}20`,
+                                color: option.borderColor,
+                                border: `1px solid ${option.borderColor}`
+                              }}
+                            >
+                              Applied
+                            </Badge>
+                          )}
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-2">
-                            <Label htmlFor={option.id} className="font-semibold text-gray-900 cursor-pointer text-sm">
-                              {option.title}
-                            </Label>
-                            {isSelected && (
-                              <Badge 
-                                className="text-xs font-medium transition-all duration-300"
-                                style={{ 
-                                  backgroundColor: `${option.borderColor}20`,
-                                  color: option.borderColor,
-                                  border: `1px solid ${option.borderColor}`
-                                }}
-                              >
-                                Applied
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-sm text-gray-600 leading-relaxed">
-                            {option.description}
-                          </p>
-                        </div>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          {option.description}
+                        </p>
                       </div>
                     </div>
-                    
-                    <CollapsibleTrigger asChild>
-                      <Button 
-                        variant="ghost" 
-                        className="w-full mt-3 text-sm font-medium transition-all duration-300 hover:bg-gray-50"
-                        style={{ color: option.borderColor }}
-                      >
-                        {isExpanded ? 'Show less' : 'Show more'}
-                      </Button>
-                    </CollapsibleTrigger>
-                  </CardHeader>
-
-                  <CollapsibleContent className="transition-all duration-500 ease-in-out data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
-                    <CardContent className="pt-0 space-y-6">
-                      {/* Revenue Impact Chart */}
-                      <div className="animate-fade-in">
-                        <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                          <div className={`w-3 h-3 rounded-full ${option.iconBg}`} />
-                          Revenue Impact
-                        </h4>
-                        {renderRevenueChart(option.revenueChart)}
-                        <p className="text-xs text-gray-600 mt-3 leading-relaxed">
-                          {option.id === 'last-click' && 'Highest revenue attribution to Google Ads when it\'s the last touchpoint before conversion.'}
-                          {option.id === 'first-click' && 'Attributes revenue to the channel that first introduced the customer to your brand.'}
-                          {option.id === 'custom' && 'Customizable attribution based on your business priorities and marketing strategy.'}
-                        </p>
-                      </div>
-
-                      {/* Audience Size */}
-                      <div className="animate-fade-in">
-                        <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                          <div className={`w-3 h-3 rounded-full ${option.iconBg}`} />
-                          Audience Size
-                        </h4>
-                        <div className="w-full bg-gray-200 rounded-full h-4 mb-2 overflow-hidden">
-                          <div 
-                            className="h-4 rounded-full transition-all duration-700 ease-out"
-                            style={{ 
-                              width: `${option.audienceSize}%`,
-                              backgroundColor: option.borderColor
-                            }}
-                          />
-                        </div>
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-sm font-medium" style={{ color: option.borderColor }}>
-                            {option.audienceSize}%
-                          </span>
-                          <span className="text-xs text-gray-500">Potential reach</span>
-                        </div>
-                        <p className="text-xs text-gray-600 leading-relaxed">
-                          {option.audienceDescription}
-                        </p>
-                      </div>
-
-                      {/* Key Benefits */}
-                      <div className="animate-fade-in">
-                        <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                          <div className={`w-3 h-3 rounded-full ${option.iconBg}`} />
-                          Key Benefits
-                        </h4>
-                        <ul className="space-y-2">
-                          {option.benefits.map((benefit, index) => (
-                            <li key={index} className="text-xs text-gray-600 flex items-start gap-2 leading-relaxed">
-                              <span className="mt-1 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: option.borderColor }} />
-                              {benefit}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      {/* Custom Configuration */}
-                      {option.id === 'custom' && option.configuration && (
-                        <div className="animate-fade-in">
-                          <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                            <div className={`w-3 h-3 rounded-full ${option.iconBg}`} />
-                            Attribution Configuration
-                          </h4>
-                          <div className="space-y-3 rounded-lg p-4" style={{ backgroundColor: `${option.borderColor}10` }}>
-                            <div>
-                              <span className="text-xs font-medium text-gray-700">Attribution Model Type</span>
-                              <p className="text-xs text-gray-600 mt-1">{option.configuration.modelType}</p>
-                            </div>
-                            <div>
-                              <span className="text-xs font-medium text-gray-700">Channel Priority</span>
-                              <div className="space-y-1 mt-2">
-                                {Object.entries(option.configuration.channelPriorities).map(([channel, priority]) => (
-                                  <div key={channel} className="flex justify-between items-center text-xs">
-                                    <span className="text-gray-600 capitalize">{channel}</span>
-                                    <span className="font-medium px-2 py-1 rounded" style={{ 
-                                      backgroundColor: `${option.borderColor}20`,
-                                      color: option.borderColor
-                                    }}>
-                                      {priority}%
-                                    </span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                            <div>
-                              <span className="text-xs font-medium text-gray-700">Time Window</span>
-                              <p className="text-xs text-gray-600 mt-1">{option.configuration.timeWindow}</p>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Important Note/Implementation Tip */}
-                      {(option.importantNote || option.implementationTip) && (
-                        <div className="animate-fade-in">
-                          <div className="rounded-lg p-4" style={{ backgroundColor: `${option.borderColor}15`, border: `1px solid ${option.borderColor}30` }}>
-                            <div className="flex items-start gap-3">
-                              <Info className="h-4 w-4 mt-0.5 flex-shrink-0" style={{ color: option.borderColor }} />
-                              <div>
-                                <h5 className="text-xs font-medium mb-2" style={{ color: option.borderColor }}>
-                                  {option.importantNote ? 'Important Note' : 'Implementation Tip'}
-                                </h5>
-                                <p className="text-xs text-gray-700 leading-relaxed">
-                                  {option.importantNote || option.implementationTip}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </CardContent>
-                  </CollapsibleContent>
-                </Collapsible>
+                  </div>
+                </CardHeader>
               </Card>
             );
           })}
         </RadioGroup>
+
+        {/* Show More Button */}
+        <div className="flex justify-center">
+          <Button 
+            variant="outline" 
+            onClick={() => setShowDetails(!showDetails)}
+            className="transition-all duration-300 hover:scale-105 border-2 border-gray-300 hover:border-blue-400"
+          >
+            {showDetails ? (
+              <>
+                <ChevronUp className="h-4 w-4 mr-2" />
+                Show less
+              </>
+            ) : (
+              <>
+                <ChevronDown className="h-4 w-4 mr-2" />
+                Show more
+              </>
+            )}
+          </Button>
+        </div>
+
+        {/* Detailed Cards */}
+        {showDetails && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in">
+            {attributionOptions.map((option) => (
+              <Card 
+                key={`${option.id}-details`}
+                className="transition-all duration-500 ease-out animate-scale-in"
+                style={{ 
+                  borderColor: option.borderColor,
+                  borderWidth: '2px'
+                }}
+              >
+                <CardContent className="pt-6 space-y-6">
+                  {/* Revenue Impact Chart */}
+                  <div className="animate-fade-in">
+                    <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                      <div className={`w-3 h-3 rounded-full ${option.iconBg}`} />
+                      Revenue Impact
+                    </h4>
+                    {renderRevenueChart(option.revenueChart)}
+                    <p className="text-xs text-gray-600 mt-3 leading-relaxed">
+                      {option.id === 'last-click' && 'Highest revenue attribution to Google Ads when it\'s the last touchpoint before conversion.'}
+                      {option.id === 'first-click' && 'Attributes revenue to the channel that first introduced the customer to your brand.'}
+                      {option.id === 'custom' && 'Customizable attribution based on your business priorities and marketing strategy.'}
+                    </p>
+                  </div>
+
+                  {/* Audience Size */}
+                  <div className="animate-fade-in">
+                    <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                      <div className={`w-3 h-3 rounded-full ${option.iconBg}`} />
+                      Audience Size
+                    </h4>
+                    <div className="w-full bg-gray-200 rounded-full h-4 mb-2 overflow-hidden">
+                      <div 
+                        className="h-4 rounded-full transition-all duration-700 ease-out"
+                        style={{ 
+                          width: `${option.audienceSize}%`,
+                          backgroundColor: option.borderColor
+                        }}
+                      />
+                    </div>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium" style={{ color: option.borderColor }}>
+                        {option.audienceSize}%
+                      </span>
+                      <span className="text-xs text-gray-500">Potential reach</span>
+                    </div>
+                    <p className="text-xs text-gray-600 leading-relaxed">
+                      {option.audienceDescription}
+                    </p>
+                  </div>
+
+                  {/* Key Benefits */}
+                  <div className="animate-fade-in">
+                    <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                      <div className={`w-3 h-3 rounded-full ${option.iconBg}`} />
+                      Key Benefits
+                    </h4>
+                    <ul className="space-y-2">
+                      {option.benefits.map((benefit, index) => (
+                        <li key={index} className="text-xs text-gray-600 flex items-start gap-2 leading-relaxed">
+                          <span className="mt-1 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: option.borderColor }} />
+                          {benefit}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Custom Configuration */}
+                  {option.id === 'custom' && option.configuration && (
+                    <div className="animate-fade-in">
+                      <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                        <div className={`w-3 h-3 rounded-full ${option.iconBg}`} />
+                        Attribution Configuration
+                      </h4>
+                      <div className="space-y-3 rounded-lg p-4" style={{ backgroundColor: `${option.borderColor}10` }}>
+                        <div>
+                          <span className="text-xs font-medium text-gray-700">Attribution Model Type</span>
+                          <p className="text-xs text-gray-600 mt-1">{option.configuration.modelType}</p>
+                        </div>
+                        <div>
+                          <span className="text-xs font-medium text-gray-700">Channel Priority</span>
+                          <div className="space-y-1 mt-2">
+                            {Object.entries(option.configuration.channelPriorities).map(([channel, priority]) => (
+                              <div key={channel} className="flex justify-between items-center text-xs">
+                                <span className="text-gray-600 capitalize">{channel}</span>
+                                <span className="font-medium px-2 py-1 rounded" style={{ 
+                                  backgroundColor: `${option.borderColor}20`,
+                                  color: option.borderColor
+                                }}>
+                                  {priority}%
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <span className="text-xs font-medium text-gray-700">Time Window</span>
+                          <p className="text-xs text-gray-600 mt-1">{option.configuration.timeWindow}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Important Note/Implementation Tip */}
+                  {(option.importantNote || option.implementationTip) && (
+                    <div className="animate-fade-in">
+                      <div className="rounded-lg p-4" style={{ backgroundColor: `${option.borderColor}15`, border: `1px solid ${option.borderColor}30` }}>
+                        <div className="flex items-start gap-3">
+                          <Info className="h-4 w-4 mt-0.5 flex-shrink-0" style={{ color: option.borderColor }} />
+                          <div>
+                            <h5 className="text-xs font-medium mb-2" style={{ color: option.borderColor }}>
+                              {option.importantNote ? 'Important Note' : 'Implementation Tip'}
+                            </h5>
+                            <p className="text-xs text-gray-700 leading-relaxed">
+                              {option.importantNote || option.implementationTip}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
 
         {/* Understanding Attribution Models */}
         <Card className="animate-fade-in">
@@ -437,7 +447,7 @@ const AttributionSettings = () => {
                 Yes, Change Model
               </AlertDialogAction>
             </AlertDialogFooter>
-          </AlertDialogContent>
+          </AlertDialogFooter>
         </AlertDialog>
       </div>
     </Layout>
