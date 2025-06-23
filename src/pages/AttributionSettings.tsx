@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
-import { ChevronDown, ChevronUp, Info } from 'lucide-react';
+import { Info } from 'lucide-react';
 
 type AttributionModel = 'last-click' | 'first-click' | 'custom';
 
@@ -17,17 +17,16 @@ const AttributionSettings = () => {
   const [selectedAttribution, setSelectedAttribution] = useState<AttributionModel>('last-click');
   const [tempSelection, setTempSelection] = useState<AttributionModel>('last-click');
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [expandedCard, setExpandedCard] = useState<string | null>(null);
+  const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
 
   const attributionOptions = [
     {
       id: 'last-click' as const,
       title: 'Last Click Attribution',
       description: 'Only fires conversion events if the most recent gclid exists',
-      badge: 'Applied',
-      badgeColor: 'bg-blue-100 text-blue-800',
-      borderColor: 'border-blue-300',
-      isSelected: true,
+      borderColor: '#B8B5F5',
+      iconColor: 'text-blue-600',
+      iconBg: 'bg-blue-100',
       revenueChart: {
         googleAds: 85,
         facebook: 0,
@@ -48,10 +47,9 @@ const AttributionSettings = () => {
       id: 'first-click' as const,
       title: 'First Click Attribution',
       description: 'Stores the first gclid per user and only sends conversions with that ID',
-      badge: null,
-      badgeColor: '',
-      borderColor: 'border-gray-300',
-      isSelected: false,
+      borderColor: '#9DDEAD',
+      iconColor: 'text-green-600',
+      iconBg: 'bg-green-100',
       revenueChart: {
         googleAds: 55,
         facebook: 25,
@@ -72,10 +70,9 @@ const AttributionSettings = () => {
       id: 'custom' as const,
       title: 'Custom Attribution',
       description: 'Define your own logic like "prioritize Google Ads if not from Facebook, TikTok..."',
-      badge: null,
-      badgeColor: '',
-      borderColor: 'border-gray-300',
-      isSelected: false,
+      borderColor: '#F2CC8F',
+      iconColor: 'text-orange-600',
+      iconBg: 'bg-orange-100',
       revenueChart: {
         googleAds: 65,
         facebook: 15,
@@ -122,15 +119,16 @@ const AttributionSettings = () => {
   };
 
   const toggleCard = (cardId: string) => {
-    setExpandedCard(expandedCard === cardId ? null : cardId);
-  };
-
-  const getMaxChartValue = (chart: any) => {
-    return Math.max(chart.googleAds, chart.facebook, chart.tiktok, chart.other);
+    const newExpanded = new Set(expandedCards);
+    if (newExpanded.has(cardId)) {
+      newExpanded.delete(cardId);
+    } else {
+      newExpanded.add(cardId);
+    }
+    setExpandedCards(newExpanded);
   };
 
   const renderRevenueChart = (chart: any) => {
-    const maxValue = getMaxChartValue(chart);
     const channels = [
       { name: 'Google Ads', value: chart.googleAds, color: 'bg-blue-500' },
       { name: 'Facebook', value: chart.facebook, color: 'bg-green-500' },
@@ -142,20 +140,20 @@ const AttributionSettings = () => {
       <div className="space-y-3">
         <div className="flex justify-between text-sm text-gray-600">
           <span>Revenue Attribution</span>
-          <span>100</span>
+          <span>100%</span>
         </div>
         <div className="space-y-2">
           {channels.map((channel) => (
             <div key={channel.name} className="flex items-center gap-3">
               <span className="text-xs w-16 text-gray-600">{channel.name}</span>
-              <div className="flex-1 bg-gray-200 rounded-full h-6 relative">
+              <div className="flex-1 bg-gray-200 rounded-full h-6 relative overflow-hidden">
                 <div
-                  className={`${channel.color} h-6 rounded-full transition-all duration-300`}
-                  style={{ width: `${(channel.value / 100) * 100}%` }}
+                  className={`${channel.color} h-6 rounded-full transition-all duration-500 ease-out`}
+                  style={{ width: `${channel.value}%` }}
                 />
                 {channel.value > 0 && (
                   <span className="absolute inset-0 flex items-center justify-center text-xs font-medium text-white">
-                    {channel.value}
+                    {channel.value}%
                   </span>
                 )}
               </div>
@@ -165,8 +163,6 @@ const AttributionSettings = () => {
       </div>
     );
   };
-
-  const selectedOption = attributionOptions.find(opt => opt.id === selectedAttribution);
 
   return (
     <Layout title="Attribution Settings" subtitle="Configure your attribution model">
@@ -179,63 +175,85 @@ const AttributionSettings = () => {
         >
           {attributionOptions.map((option) => {
             const isSelected = selectedAttribution === option.id;
-            const isExpanded = expandedCard === option.id;
+            const isExpanded = expandedCards.has(option.id);
             
             return (
               <Card 
                 key={option.id} 
                 className={`
-                  transition-all duration-200 cursor-pointer
+                  transition-all duration-300 cursor-pointer transform hover:scale-[1.02] hover:shadow-lg
                   ${isSelected 
-                    ? 'border-2 border-blue-500 shadow-lg' 
-                    : 'border border-gray-300 hover:border-gray-400'
+                    ? 'border-2 shadow-lg' 
+                    : 'border-2 hover:border-gray-400'
                   }
                 `}
+                style={{ 
+                  borderColor: isSelected ? option.borderColor : '#e5e7eb',
+                  boxShadow: isSelected ? `0 10px 25px -5px ${option.borderColor}30` : undefined
+                }}
               >
                 <Collapsible open={isExpanded} onOpenChange={() => toggleCard(option.id)}>
                   <CardHeader className="pb-4">
                     <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <RadioGroupItem 
-                          value={option.id} 
-                          id={option.id}
-                          className="data-[state=checked]:border-blue-500 data-[state=checked]:text-blue-500"
-                        />
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Label htmlFor={option.id} className="font-semibold text-gray-900 cursor-pointer">
+                      <div className="flex items-start gap-3 flex-1">
+                        <div className="flex items-center gap-2 mt-1">
+                          <RadioGroupItem 
+                            value={option.id} 
+                            id={option.id}
+                            className="data-[state=checked]:border-2"
+                            style={{ 
+                              borderColor: isSelected ? option.borderColor : undefined,
+                              color: isSelected ? option.borderColor : undefined
+                            }}
+                          />
+                          <div className={`w-2 h-2 rounded-full ${option.iconBg} transition-all duration-300`} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-2">
+                            <Label htmlFor={option.id} className="font-semibold text-gray-900 cursor-pointer text-sm">
                               {option.title}
                             </Label>
                             {isSelected && (
-                              <Badge className="bg-blue-100 text-blue-800 text-xs">
+                              <Badge 
+                                className="text-xs font-medium transition-all duration-300"
+                                style={{ 
+                                  backgroundColor: `${option.borderColor}20`,
+                                  color: option.borderColor,
+                                  border: `1px solid ${option.borderColor}`
+                                }}
+                              >
                                 Applied
                               </Badge>
                             )}
                           </div>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-gray-600 leading-relaxed">
                             {option.description}
                           </p>
                         </div>
                       </div>
-                      <CollapsibleTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                          {isExpanded ? (
-                            <ChevronUp className="h-4 w-4 text-gray-400" />
-                          ) : (
-                            <ChevronDown className="h-4 w-4 text-gray-400" />
-                          )}
-                        </Button>
-                      </CollapsibleTrigger>
                     </div>
+                    
+                    <CollapsibleTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        className="w-full mt-3 text-sm font-medium transition-all duration-300 hover:bg-gray-50"
+                        style={{ color: option.borderColor }}
+                      >
+                        {isExpanded ? 'Show less' : 'Show more'}
+                      </Button>
+                    </CollapsibleTrigger>
                   </CardHeader>
 
-                  <CollapsibleContent>
+                  <CollapsibleContent className="transition-all duration-500 ease-in-out data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
                     <CardContent className="pt-0 space-y-6">
                       {/* Revenue Impact Chart */}
-                      <div>
-                        <h4 className="font-medium text-gray-900 mb-3">Revenue Impact</h4>
+                      <div className="animate-fade-in">
+                        <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                          <div className={`w-3 h-3 rounded-full ${option.iconBg}`} />
+                          Revenue Impact
+                        </h4>
                         {renderRevenueChart(option.revenueChart)}
-                        <p className="text-xs text-gray-600 mt-2">
+                        <p className="text-xs text-gray-600 mt-3 leading-relaxed">
                           {option.id === 'last-click' && 'Highest revenue attribution to Google Ads when it\'s the last touchpoint before conversion.'}
                           {option.id === 'first-click' && 'Attributes revenue to the channel that first introduced the customer to your brand.'}
                           {option.id === 'custom' && 'Customizable attribution based on your business priorities and marketing strategy.'}
@@ -243,26 +261,41 @@ const AttributionSettings = () => {
                       </div>
 
                       {/* Audience Size */}
-                      <div>
-                        <h4 className="font-medium text-gray-900 mb-3">Audience Size</h4>
-                        <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
+                      <div className="animate-fade-in">
+                        <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                          <div className={`w-3 h-3 rounded-full ${option.iconBg}`} />
+                          Audience Size
+                        </h4>
+                        <div className="w-full bg-gray-200 rounded-full h-4 mb-2 overflow-hidden">
                           <div 
-                            className="bg-blue-500 h-3 rounded-full transition-all duration-300"
-                            style={{ width: `${option.audienceSize}%` }}
+                            className="h-4 rounded-full transition-all duration-700 ease-out"
+                            style={{ 
+                              width: `${option.audienceSize}%`,
+                              backgroundColor: option.borderColor
+                            }}
                           />
                         </div>
-                        <p className="text-xs text-gray-600">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm font-medium" style={{ color: option.borderColor }}>
+                            {option.audienceSize}%
+                          </span>
+                          <span className="text-xs text-gray-500">Potential reach</span>
+                        </div>
+                        <p className="text-xs text-gray-600 leading-relaxed">
                           {option.audienceDescription}
                         </p>
                       </div>
 
                       {/* Key Benefits */}
-                      <div>
-                        <h4 className="font-medium text-gray-900 mb-3">Key Benefits</h4>
-                        <ul className="space-y-1">
+                      <div className="animate-fade-in">
+                        <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                          <div className={`w-3 h-3 rounded-full ${option.iconBg}`} />
+                          Key Benefits
+                        </h4>
+                        <ul className="space-y-2">
                           {option.benefits.map((benefit, index) => (
-                            <li key={index} className="text-xs text-gray-600 flex items-start gap-2">
-                              <span className="text-green-500 mt-0.5">•</span>
+                            <li key={index} className="text-xs text-gray-600 flex items-start gap-2 leading-relaxed">
+                              <span className="mt-1 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: option.borderColor }} />
                               {benefit}
                             </li>
                           ))}
@@ -271,27 +304,35 @@ const AttributionSettings = () => {
 
                       {/* Custom Configuration */}
                       {option.id === 'custom' && option.configuration && (
-                        <div>
-                          <h4 className="font-medium text-gray-900 mb-3">Attribution Configuration</h4>
-                          <div className="space-y-3 bg-gray-50 rounded-lg p-3">
+                        <div className="animate-fade-in">
+                          <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                            <div className={`w-3 h-3 rounded-full ${option.iconBg}`} />
+                            Attribution Configuration
+                          </h4>
+                          <div className="space-y-3 rounded-lg p-4" style={{ backgroundColor: `${option.borderColor}10` }}>
                             <div>
                               <span className="text-xs font-medium text-gray-700">Attribution Model Type</span>
-                              <p className="text-xs text-gray-600">{option.configuration.modelType}</p>
+                              <p className="text-xs text-gray-600 mt-1">{option.configuration.modelType}</p>
                             </div>
                             <div>
                               <span className="text-xs font-medium text-gray-700">Channel Priority</span>
-                              <div className="space-y-1 mt-1">
+                              <div className="space-y-1 mt-2">
                                 {Object.entries(option.configuration.channelPriorities).map(([channel, priority]) => (
-                                  <div key={channel} className="flex justify-between text-xs">
+                                  <div key={channel} className="flex justify-between items-center text-xs">
                                     <span className="text-gray-600 capitalize">{channel}</span>
-                                    <span className="text-gray-900 font-medium">{priority}</span>
+                                    <span className="font-medium px-2 py-1 rounded" style={{ 
+                                      backgroundColor: `${option.borderColor}20`,
+                                      color: option.borderColor
+                                    }}>
+                                      {priority}%
+                                    </span>
                                   </div>
                                 ))}
                               </div>
                             </div>
                             <div>
                               <span className="text-xs font-medium text-gray-700">Time Window</span>
-                              <p className="text-xs text-gray-600">{option.configuration.timeWindow}</p>
+                              <p className="text-xs text-gray-600 mt-1">{option.configuration.timeWindow}</p>
                             </div>
                           </div>
                         </div>
@@ -299,16 +340,18 @@ const AttributionSettings = () => {
 
                       {/* Important Note/Implementation Tip */}
                       {(option.importantNote || option.implementationTip) && (
-                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-                          <div className="flex items-start gap-2">
-                            <Info className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                            <div>
-                              <h5 className="text-xs font-medium text-amber-900 mb-1">
-                                {option.importantNote ? 'Important Note' : 'Implementation Tip'}
-                              </h5>
-                              <p className="text-xs text-amber-800">
-                                {option.importantNote || option.implementationTip}
-                              </p>
+                        <div className="animate-fade-in">
+                          <div className="rounded-lg p-4" style={{ backgroundColor: `${option.borderColor}15`, border: `1px solid ${option.borderColor}30` }}>
+                            <div className="flex items-start gap-3">
+                              <Info className="h-4 w-4 mt-0.5 flex-shrink-0" style={{ color: option.borderColor }} />
+                              <div>
+                                <h5 className="text-xs font-medium mb-2" style={{ color: option.borderColor }}>
+                                  {option.importantNote ? 'Important Note' : 'Implementation Tip'}
+                                </h5>
+                                <p className="text-xs text-gray-700 leading-relaxed">
+                                  {option.importantNote || option.implementationTip}
+                                </p>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -322,43 +365,46 @@ const AttributionSettings = () => {
         </RadioGroup>
 
         {/* Understanding Attribution Models */}
-        <Card>
+        <Card className="animate-fade-in">
           <CardHeader>
-            <CardTitle>Understanding Attribution Models</CardTitle>
+            <CardTitle className="flex items-center gap-3">
+              <div className="w-1 h-6 bg-gradient-to-b from-blue-500 via-green-500 to-orange-500 rounded-full" />
+              Understanding Attribution Models
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 mb-6 leading-relaxed">
               Attribution models determine how credit for conversions is assigned to touchpoints in the customer journey. 
               Choosing the right model impacts how you measure campaign performance and allocate your marketing budget.
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="space-y-2">
+              <div className="space-y-3 p-4 rounded-lg bg-blue-50 border border-blue-200 transition-all duration-300 hover:shadow-md">
                 <h4 className="font-medium text-gray-900 flex items-center gap-2">
                   <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                   Last Click
                 </h4>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 leading-relaxed">
                   100% of the conversion value is attributed to the last Google Ads click before the conversion.
                 </p>
               </div>
               
-              <div className="space-y-2">
+              <div className="space-y-3 p-4 rounded-lg bg-green-50 border border-green-200 transition-all duration-300 hover:shadow-md">
                 <h4 className="font-medium text-gray-900 flex items-center gap-2">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                   First Click
                 </h4>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 leading-relaxed">
                   100% of the conversion value is attributed to the first Google Ads click in the customer journey.
                 </p>
               </div>
               
-              <div className="space-y-2">
+              <div className="space-y-3 p-4 rounded-lg bg-orange-50 border border-orange-200 transition-all duration-300 hover:shadow-md">
                 <h4 className="font-medium text-gray-900 flex items-center gap-2">
                   <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
                   Custom
                 </h4>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 leading-relaxed">
                   Attribution is based on your defined rules, allowing for flexible credit assignment across channels.
                 </p>
               </div>
@@ -367,22 +413,27 @@ const AttributionSettings = () => {
         </Card>
 
         {/* Bottom Note */}
-        <p className="text-center text-gray-500 text-sm">
+        <p className="text-center text-gray-500 text-sm animate-fade-in">
           You can change your attribution model settings at any time.
         </p>
 
         {/* Confirmation Dialog */}
         <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-          <AlertDialogContent>
+          <AlertDialogContent className="max-w-md">
             <AlertDialogHeader>
-              <AlertDialogTitle>Change Attribution Model?</AlertDialogTitle>
-              <AlertDialogDescription>
+              <AlertDialogTitle className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                Change Attribution Model?
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-gray-600 leading-relaxed">
                 Are you sure you want to change your attribution model? This will affect how future conversions are tracked and attributed to your campaigns.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel onClick={cancelChange}>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={confirmChange}>
+              <AlertDialogCancel onClick={cancelChange} className="transition-all duration-200">
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction onClick={confirmChange} className="transition-all duration-200">
                 Yes, Change Model
               </AlertDialogAction>
             </AlertDialogFooter>
