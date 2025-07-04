@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { BarChart3, Lock, Settings } from 'lucide-react';
 import AnalyticsOnboardingModal from './AnalyticsOnboardingModal';
 import { useOnboarding } from '@/hooks/useOnboarding';
@@ -19,6 +20,7 @@ const AnalyticsGate: React.FC<AnalyticsGateProps> = ({
 }) => {
   const { isOnboardingCompleted, completeOnboarding, resetOnboarding } = useOnboarding();
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showModal, setShowModal] = useState(!isOnboardingCompleted);
 
   if (isOnboardingCompleted) {
     return (
@@ -42,17 +44,27 @@ const AnalyticsGate: React.FC<AnalyticsGateProps> = ({
 
   return (
     <>
-      <div className="min-h-[60vh] flex items-center justify-center p-6">
-        <Card className="max-w-md w-full">
-          <CardContent className="p-8 text-center space-y-6">
-            <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+      {/* Show the actual content in the background */}
+      <div className="space-y-4">
+        {children}
+      </div>
+
+      {/* Modal overlay */}
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
               <Lock className="h-8 w-8 text-blue-600" />
             </div>
-            
-            <div className="space-y-2">
-              <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
-              <p className="text-gray-600">{description}</p>
-            </div>
+            <DialogTitle className="text-center text-xl font-semibold">
+              Hoàn thành Onboarding
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="text-center space-y-6">
+            <p className="text-gray-600">
+              Bạn phải hoàn thành onboarding để sử dụng tính năng này
+            </p>
 
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -70,20 +82,26 @@ const AnalyticsGate: React.FC<AnalyticsGateProps> = ({
             </div>
 
             <Button 
-              onClick={() => setShowOnboarding(true)}
+              onClick={() => {
+                setShowModal(false);
+                setShowOnboarding(true);
+              }}
               className="w-full"
               size="lg"
             >
-              Start Setup
+              Bắt đầu Onboarding
             </Button>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <AnalyticsOnboardingModal
         isOpen={showOnboarding}
         onClose={() => setShowOnboarding(false)}
-        onComplete={completeOnboarding}
+        onComplete={() => {
+          completeOnboarding();
+          setShowModal(false);
+        }}
       />
     </>
   );
